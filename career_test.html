@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Диагностика карьерной идентичности</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh}
+.header{background:#1e3a5f;color:#fff;padding:14px 18px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.header-title{font-size:14px;font-weight:700;margin-bottom:8px;opacity:.9}
+.prog-bar{height:5px;background:rgba(255,255,255,.2);border-radius:3px}
+.prog-fill{height:100%;background:#0f9b8e;border-radius:3px;transition:width .4s ease}
+.prog-text{font-size:11px;opacity:.65;margin-top:5px}
+.wrap{max-width:640px;margin:0 auto;padding:20px 14px 120px}
+.section{display:none}
+.section.active{display:block}
+.card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:18px;overflow:hidden}
+.card-head{background:#1e3a5f;color:#fff;padding:18px 20px}
+.card-head .tag{display:inline-block;background:#0f9b8e;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;letter-spacing:.5px}
+.card-head h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.card-head p{font-size:13px;opacity:.8;line-height:1.5}
+.card-body{padding:20px}
+.instr{background:#f0f9ff;border-left:4px solid #0d7377;padding:12px 14px;border-radius:0 8px 8px 0;margin-bottom:20px;font-size:13px;color:#374151;line-height:1.6}
+.field{margin-bottom:18px}
+.field label.lbl{display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+.field input[type=text],.field input[type=number]{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:15px;transition:border-color .2s}
+.field input:focus{outline:none;border-color:#0d7377}
+.ropts{display:flex;flex-direction:column;gap:7px}
+.ropt{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:all .15s}
+.ropt:hover{border-color:#0d7377;background:#f0fdfa}
+.ropt input{width:18px;height:18px;accent-color:#0d7377;flex-shrink:0}
+.ropt span{font-size:14px;color:#374151}
+.ropt.sel{border-color:#0d7377;background:#f0fdfa}
+/* Question blocks */
+.qblock{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid #f1f5f9}
+.qblock:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.qnum{font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase}
+.qtxt{font-size:14px;color:#1e293b;line-height:1.55;margin-bottom:12px}
+/* 4-point scale */
+.s4{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+@media(min-width:400px){.s4{grid-template-columns:repeat(4,1fr)}}
+.s4 label{cursor:pointer}
+.s4 input{display:none}
+.s4 .b{display:block;padding:9px 4px;text-align:center;border:1.5px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;line-height:1.4;transition:all .15s;min-height:44px;display:flex;align-items:center;justify-content:center}
+.s4 input:checked+.b{background:#0d7377;border-color:#0d7377;color:#fff;font-weight:700}
+.s4 label:hover .b{border-color:#0d7377;color:#0d7377}
+/* 5-point scale */
+.s5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.s5 label{cursor:pointer}
+.s5 input{display:none}
+.s5 .b{display:block;padding:9px 2px;text-align:center;border:1.5px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;line-height:1.4;transition:all .15s;min-height:44px;display:flex;align-items:center;justify-content:center}
+.s5 input:checked+.b{background:#0d7377;border-color:#0d7377;color:#fff;font-weight:700}
+.s5 label:hover .b{border-color:#0d7377;color:#0d7377}
+/* 7-point scale 0-6 */
+.s7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.s7 label{cursor:pointer}
+.s7 input{display:none}
+.s7 .b{display:block;padding:9px 2px;text-align:center;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:600;color:#475569;transition:all .15s;min-height:40px;display:flex;align-items:center;justify-content:center}
+.s7 input:checked+.b{background:#0d7377;border-color:#0d7377;color:#fff}
+.s7 label:hover .b{border-color:#0d7377}
+.s7-labels{display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:5px;padding:0 2px}
+/* 10-point scale */
+.s10-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.s10{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;min-width:360px}
+.s10 label{cursor:pointer}
+.s10 input{display:none}
+.s10 .b{display:block;padding:10px 2px;text-align:center;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-weight:700;color:#475569;transition:all .15s;min-height:44px;display:flex;align-items:center;justify-content:center}
+.s10 input:checked+.b{background:#0d7377;border-color:#0d7377;color:#fff}
+.s10 label:hover .b{border-color:#0d7377;color:#0d7377}
+.s10-labels{display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;margin-bottom:5px}
+/* Nav buttons */
+.navbtns{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:12px 16px;box-shadow:0 -2px 10px rgba(0,0,0,.1);display:flex;gap:10px;z-index:99}
+.navbtns>*{max-width:640px;margin:0 auto}
+.btn-next{flex:1;background:#1e3a5f;color:#fff;border:none;padding:15px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;transition:background .15s;width:100%}
+.btn-next:hover{background:#0d7377}
+.btn-prev{background:transparent;color:#64748b;border:1.5px solid #e2e8f0;padding:15px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.navinner{display:flex;gap:10px;width:100%;max-width:640px;margin:0 auto}
+/* Results */
+.res-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:20px;margin-bottom:16px}
+.res-card h3{font-size:16px;font-weight:700;color:#1e3a5f;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #f0f4f8}
+.rsubscale{margin-bottom:14px}
+.rsubscale-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.rsubscale-nm{font-size:13px;color:#374151;font-weight:600}
+.rbadge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.bg-g{background:#dcfce7;color:#166534}
+.bg-y{background:#fef9c3;color:#92400e}
+.bg-r{background:#fee2e2;color:#7f1d1d}
+.rbar-bg{height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;margin-bottom:6px}
+.rbar{height:100%;border-radius:4px;transition:width .8s ease}
+.bar-g{background:#22c55e}
+.bar-y{background:#f59e0b}
+.bar-r{background:#ef4444}
+.rinterp{font-size:12px;color:#64748b;line-height:1.5}
+.anchor-top{background:#f0fdfa;border:1.5px solid #0d7377;border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.anchor-top h4{font-size:13px;font-weight:700;color:#0d7377;margin-bottom:4px}
+.anchor-top p{font-size:12px;color:#374151;line-height:1.5}
+/* Sending */
+.sending-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.9);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.sending-overlay.show{display:flex}
+.spinner{width:48px;height:48px;border:4px solid #e2e8f0;border-top-color:#0d7377;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sending-txt{font-size:16px;color:#374151;font-weight:600}
+.done-hero{text-align:center;padding:40px 20px}
+.done-icon{font-size:64px;margin-bottom:16px}
+.done-hero h2{font-size:22px;font-weight:700;color:#1e3a5f;margin-bottom:8px}
+.done-hero p{font-size:14px;color:#64748b;line-height:1.65}
+.err-banner{background:#fee2e2;border:1.5px solid #fca5a5;color:#7f1d1d;padding:12px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
+.req-star{color:#dc2626}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">Диагностика карьерной идентичности</div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="prog-text" id="progText">Шаг 1 из 7: Общие сведения</div>
+</div>
+
+<div class="sending-overlay" id="sendingOverlay">
+  <div class="spinner"></div>
+  <div class="sending-txt">Отправка результатов…</div>
+</div>
+
+<div class="wrap">
+
+<!-- SECTION 0: Демография -->
+<div class="section active" id="sec0">
+<div class="card">
+  <div class="card-head">
+    <div class="tag">ШАБЛОН УЧАСТНИКА</div>
+    <h2>Общие сведения</h2>
+    <p>Все данные анонимны. Используйте свой уникальный код из списка, выданного организатором.</p>
+  </div>
+  <div class="card-body">
+    <div class="field">
+      <label class="lbl">Код участника <span class="req-star">*</span></label>
+      <input type="text" id="d_code" placeholder="Например: KX47" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="lbl">Подразделение <span class="req-star">*</span></label>
+      <input type="text" id="d_dept" placeholder="Укажите название подразделения" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="lbl">Пол</label>
+      <div class="ropts" id="d_gender">
+        <label class="ropt"><input type="radio" name="gender" value="Мужской"><span>Мужской</span></label>
+        <label class="ropt"><input type="radio" name="gender" value="Женский"><span>Женский</span></label>
+        <label class="ropt"><input type="radio" name="gender" value="Предпочитаю не указывать"><span>Предпочитаю не указывать</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Возраст <span class="req-star">*</span></label>
+      <div class="ropts" id="d_age">
+        <label class="ropt"><input type="radio" name="age" value="до 20"><span>До 20 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="21–25"><span>21–25 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="26–30"><span>26–30 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="31–35"><span>31–35 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="36–40"><span>36–40 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="41–45"><span>41–45 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="46–50"><span>46–50 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="51–55"><span>51–55 лет</span></label>
+        <label class="ropt"><input type="radio" name="age" value="старше 55"><span>Старше 55 лет</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Стаж в ДО (дочернем обществе) <span class="req-star">*</span></label>
+      <div class="ropts" id="d_exp_do">
+        <label class="ropt"><input type="radio" name="exp_do" value="до 3 мес"><span>До 3 месяцев</span></label>
+        <label class="ropt"><input type="radio" name="exp_do" value="3–6 мес"><span>3–6 месяцев</span></label>
+        <label class="ropt"><input type="radio" name="exp_do" value="6 мес–1 год"><span>6 месяцев – 1 год</span></label>
+        <label class="ropt"><input type="radio" name="exp_do" value="1–3 года"><span>1–3 года</span></label>
+        <label class="ropt"><input type="radio" name="exp_do" value="3–5 лет"><span>3–5 лет</span></label>
+        <label class="ropt"><input type="radio" name="exp_do" value="5–10 лет"><span>5–10 лет</span></label>
+        <label class="ropt"><input type="radio" name="exp_do" value="более 10 лет"><span>Более 10 лет</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Стаж в ГПН (Газпром Нефть) <span class="req-star">*</span></label>
+      <div class="ropts" id="d_exp_gpn">
+        <label class="ropt"><input type="radio" name="exp_gpn" value="до 3 мес"><span>До 3 месяцев</span></label>
+        <label class="ropt"><input type="radio" name="exp_gpn" value="3–6 мес"><span>3–6 месяцев</span></label>
+        <label class="ropt"><input type="radio" name="exp_gpn" value="6 мес–1 год"><span>6 месяцев – 1 год</span></label>
+        <label class="ropt"><input type="radio" name="exp_gpn" value="1–3 года"><span>1–3 года</span></label>
+        <label class="ropt"><input type="radio" name="exp_gpn" value="3–5 лет"><span>3–5 лет</span></label>
+        <label class="ropt"><input type="radio" name="exp_gpn" value="5–10 лет"><span>5–10 лет</span></label>
+        <label class="ropt"><input type="radio" name="exp_gpn" value="более 10 лет"><span>Более 10 лет</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="lbl">Общий трудовой стаж (полных лет) <span class="req-star">*</span></label>
+      <input type="number" id="d_exp_total" min="0" max="50" placeholder="Введите число лет">
+    </div>
+    <div class="err-banner" id="errDemо">Пожалуйста, заполните все обязательные поля.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 1: МИПИ -->
+<div class="section" id="sec1">
+<div class="card">
+  <div class="card-head">
+    <div class="tag">МЕТОДИКА 1 из 5</div>
+    <h2>Профессиональная идентичность</h2>
+    <p>Опросник МИПИ (Шнейдер–Марсиа) — 20 утверждений</p>
+  </div>
+  <div class="card-body">
+    <div class="instr">Оцените каждое утверждение по шкале от 1 до 4:<br>
+      <strong>1</strong> — Совсем не про меня &nbsp;·&nbsp; <strong>2</strong> — Скорее нет &nbsp;·&nbsp; <strong>3</strong> — Скорее да &nbsp;·&nbsp; <strong>4</strong> — Полностью про меня</div>
+    <div id="mipi_qs"></div>
+    <div class="err-banner" id="errMipi">Пожалуйста, ответьте на все вопросы раздела.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 2: Якоря Шейна -->
+<div class="section" id="sec2">
+<div class="card">
+  <div class="card-head">
+    <div class="tag">МЕТОДИКА 2 из 5</div>
+    <h2>Якоря карьеры</h2>
+    <p>Э. Шейн — 40 утверждений</p>
+  </div>
+  <div class="card-body">
+    <div class="instr">Оцените, насколько каждое утверждение верно для вас, по шкале от <strong>1</strong> (совсем не верно) до <strong>10</strong> (абсолютно верно).<br>Прокрутите вправо, если шкала не помещается на экране.</div>
+    <div id="schein_qs"></div>
+    <div class="err-banner" id="errSchein">Пожалуйста, ответьте на все вопросы раздела.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 3: MBI-GS -->
+<div class="section" id="sec3">
+<div class="card">
+  <div class="card-head">
+    <div class="tag">МЕТОДИКА 3 из 5</div>
+    <h2>Профессиональное выгорание</h2>
+    <p>MBI-GS (Маслач) — 16 утверждений</p>
+  </div>
+  <div class="card-body">
+    <div class="instr">Как часто вы испытываете то, что описано в утверждении?<br>
+      <strong>0</strong> — Никогда &nbsp;·&nbsp; <strong>1</strong> — Несколько раз в год &nbsp;·&nbsp; <strong>2</strong> — Раз в месяц &nbsp;·&nbsp; <strong>3</strong> — Несколько раз в месяц &nbsp;·&nbsp; <strong>4</strong> — Раз в неделю &nbsp;·&nbsp; <strong>5</strong> — Несколько раз в неделю &nbsp;·&nbsp; <strong>6</strong> — Каждый день</div>
+    <div id="mbi_qs"></div>
+    <div class="err-banner" id="errMbi">Пожалуйста, ответьте на все вопросы раздела.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 4: Career Satisfaction -->
+<div class="section" id="sec4">
+<div class="card">
+  <div class="card-head">
+    <div class="tag">МЕТОДИКА 4 из 5</div>
+    <h2>Удовлетворённость карьерой</h2>
+    <p>Career Satisfaction Scale (Гринхаус) — 5 утверждений</p>
+  </div>
+  <div class="card-body">
+    <div class="instr">Оцените степень вашего согласия с каждым утверждением:<br>
+      <strong>1</strong> — Совсем не согласен(на) &nbsp;·&nbsp; <strong>2</strong> — Не согласен(на) &nbsp;·&nbsp; <strong>3</strong> — Затрудняюсь &nbsp;·&nbsp; <strong>4</strong> — Согласен(на) &nbsp;·&nbsp; <strong>5</strong> — Полностью согласен(на)</div>
+    <div id="cs_qs"></div>
+    <div class="err-banner" id="errCs">Пожалуйста, ответьте на все вопросы раздела.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 5: Зеер -->
+<div class="section" id="sec5">
+<div class="card">
+  <div class="card-head">
+    <div class="tag">МЕТОДИКА 5 из 5</div>
+    <h2>Кризис профессиональной деятельности</h2>
+    <p>Опросник Зеер–Азарных — 20 утверждений</p>
+  </div>
+  <div class="card-body">
+    <div class="instr">Оцените каждое утверждение по шкале от 1 до 4:<br>
+      <strong>1</strong> — Совсем не про меня &nbsp;·&nbsp; <strong>2</strong> — Скорее нет &nbsp;·&nbsp; <strong>3</strong> — Скорее да &nbsp;·&nbsp; <strong>4</strong> — Полностью про меня</div>
+    <div id="zeer_qs"></div>
+    <div class="err-banner" id="errZeer">Пожалуйста, ответьте на все вопросы раздела.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 6: Results -->
+<div class="section" id="sec6">
+<div class="card" style="margin-bottom:10px">
+  <div class="card-head" style="background:#0d7377">
+    <div class="tag" style="background:#1e3a5f">ВАШИ РЕЗУЛЬТАТЫ</div>
+    <h2>Карьерный профиль</h2>
+    <p id="resSubtitle">Код участника: —</p>
+  </div>
+</div>
+<div id="results_container"></div>
+<div class="done-hero">
+  <div class="done-icon">✅</div>
+  <h2>Диагностика завершена!</h2>
+  <p>Ваши результаты сохранены. Анастасия Рассохина (ЗГД по работе с персоналом) обработает их и пригласит вас на индивидуальную карьерную консультацию.<br><br>Вы можете сделать скриншот этой страницы для сохранения своих результатов.</p>
+</div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="navbtns">
+  <div class="navinner">
+    <button class="btn-prev" id="btnPrev" onclick="nav(-1)" style="display:none">← Назад</button>
+    <button class="btn-next" id="btnNext" onclick="nav(1)">Далее →</button>
+  </div>
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzPqtz77w6sEAFF-iV6B9G_MlgYRhAn8PX6FEui90LlQw5_RUC68AbbYLZUvFDIBVoT/exec';
+
+// ─── QUESTION DATA ────────────────────────────────────────────────────────────
+const MIPI_Q = [
+  // A — Достигнутая идентичность (items 0,4,8,12,16)
+  "Я чётко понимаю, кем хочу быть в профессиональном плане.",
+  // B — Мораторий (1,5,9,13,17)
+  "Я нахожусь в процессе поиска своего места в профессии.",
+  // C — Преждевременная (2,6,10,14,18)
+  "Мой профессиональный путь определился без долгих размышлений — я просто следовал(а) обстоятельствам.",
+  // D — Диффузная (3,7,11,15,19)
+  "У меня нет чёткого представления о том, кем я являюсь в профессиональном плане.",
+  // A
+  "Я осознанно выбрал(а) свою профессию, взвесив различные варианты.",
+  // B
+  "Я рассматриваю разные варианты карьерного пути и пока не могу сделать окончательный выбор.",
+  // C
+  "Моя профессиональная роль сложилась под влиянием других людей (родителей, руководителей), а не моего осознанного выбора.",
+  // D
+  "Мне всё равно, в каком направлении развиваться профессионально.",
+  // A
+  "Моя профессиональная роль соответствует моим ценностям и убеждениям.",
+  // B
+  "Меня привлекают разные профессиональные направления, и я пробую новое.",
+  // C
+  "Я не задавался(ась) вопросом, подходит ли мне эта профессия — так просто сложилось.",
+  // D
+  "Я не вижу смысла задумываться о карьере — всё само как-нибудь сложится.",
+  // A
+  "Я знаю, чего хочу достичь в карьере, и последовательно двигаюсь к этому.",
+  // B
+  "Я часто задаю себе вопрос: правильную ли профессию я выбрал(а)?",
+  // C
+  "Мой карьерный путь был предопределён заранее, и я не рассматривал(а) альтернативы.",
+  // D
+  "Профессиональные планы меня мало интересуют.",
+  // A
+  "Даже в трудные периоды я сохраняю ясность в отношении своей профессиональной роли.",
+  // B
+  "Я нахожусь в поиске своего профессионального призвания.",
+  // C
+  "Я принял(а) профессиональный выбор, не особо задумываясь о нём.",
+  // D
+  "Я не могу сказать, что у меня есть сложившаяся профессиональная идентичность."
+];
+
+// indices for each subscale (0-based)
+const MIPI_KEYS = {A:[0,4,8,12,16], B:[1,5,9,13,17], C:[2,6,10,14,18], D:[3,7,11,15,19]};
+const MIPI_NAMES = {A:'Достигнутая идентичность', B:'Мораторий (поиск)', C:'Преждевременная идентичность', D:'Диффузная идентичность'};
+
+const SCHEIN_Q = [
+  "Я мечтаю стать настолько хорошим в своём деле, что мои экспертные советы будут востребованы.",
+  "Я больше всего удовлетворён работой, когда мне удаётся успешно объединить и направить усилия других людей.",
+  "Я мечтаю о карьере, которая давала бы мне свободу делать работу по-своему и в своём темпе.",
+  "Для меня безопасность и стабильность важнее, чем свобода и гибкость.",
+  "Я всегда искал(а) возможности создать что-то новое или организовать своё дело.",
+  "Я чувствую себя успешным(ой) только тогда, когда вношу реальный вклад в благополучие общества.",
+  "Я мечтаю о карьере, которая постоянно ставит передо мной новые сложные задачи.",
+  "Я предпочёл(ла) бы сменить работу, чем оказаться в ситуации, когда личная жизнь страдает из-за карьеры.",
+  "Я чувствую себя успешным(ой), только когда могу развивать свои профессиональные навыки и экспертизу.",
+  "Я мечтаю о карьере, в которой смогу руководить комплексными проектами и командами.",
+  "Я чувствую наибольшее удовлетворение, когда имею полную свободу в выборе методов и сроков работы.",
+  "Стабильное место работы с надёжным пакетом льгот важнее для меня, чем интересная, но рискованная работа.",
+  "Я чувствую себя успешным(ой), только когда создаю что-то новое — бизнес, услугу, продукт или идею.",
+  "Я чувствую наибольший успех, когда моя карьера позволяет мне вносить вклад в интересы общества.",
+  "Я чувствую себя успешным(ой), только когда мне предстоит решить сложную задачу или победить в жёсткой конкуренции.",
+  "Для меня важно, чтобы работа не мешала мне заниматься личными и семейными делами.",
+  "Стать признанным экспертом в своей технической или профессиональной области для меня важнее, чем стать общим менеджером.",
+  "Я чувствую себя успешным(ой), только когда достигаю полного руководства организацией.",
+  "Я хочу свободно планировать рабочий день и не люблю, когда меня жёстко контролируют.",
+  "Я предпочту работу в надёжной организации с хорошим пакетом социального обеспечения.",
+  "Я прикладываю все усилия, чтобы мои идеи и проекты стали реальностью.",
+  "Использование своих навыков для достижения общественного блага — самое важное в моей профессиональной жизни.",
+  "Меня манит возможность решать задачи, которые кажутся другим неразрешимыми.",
+  "Для меня важно достичь баланса между требованиями личной жизни и работой.",
+  "Я скорее уйду из организации, чем соглашусь на должность вне своей профессиональной области.",
+  "Стать генеральным директором или топ-менеджером — это главная цель моей карьеры.",
+  "Я хотел(а) бы выстраивать карьеру так, чтобы чувствовать себя хозяином(кой) своей судьбы.",
+  "Идеальная работа для меня — там, где я уверен(а), что сохраню позицию на долгие годы.",
+  "Возможность создать своё дело — это главная движущая сила моей карьеры.",
+  "Я чувствую наибольший успех, когда могу использовать таланты на службе общественным интересам.",
+  "Я ищу работу, которая бросает вызов моим способностям и профессиональному росту.",
+  "Найти способ интегрировать личные потребности с карьерой — важнее всего остального.",
+  "Признание моего профессионального мастерства — главный показатель моего успеха.",
+  "Я чувствую себя успешным(ой), только когда несу полную ответственность за работу организации.",
+  "Мои отношения с работодателем строятся на принципе: я делаю качественную работу в обмен на свободу.",
+  "Я предпочитаю компанию, которая гарантирует долгосрочную стабильную занятость.",
+  "Создание собственного предприятия — важная часть моих карьерных целей.",
+  "Я хотел(а) бы работать только в организации, разделяющей мои ценности.",
+  "Меня привлекают задачи, в которых приходится работать на пределе своих возможностей.",
+  "Для меня важно, чтобы работа позволяла мне реализовывать выбранный мной стиль жизни."
+];
+// 8 anchors, 5 items each (0-based indices)
+const SCHEIN_KEYS = {
+  'Профессиональная компетентность':[0,8,16,24,32],
+  'Менеджмент':[1,9,17,25,33],
+  'Автономия':[2,10,18,26,34],
+  'Стабильность':[3,11,19,27,35],
+  'Предпринимательство':[4,12,20,28,36],
+  'Служение':[5,13,21,29,37],
+  'Вызов':[6,14,22,30,38],
+  'Стиль жизни':[7,15,23,31,39]
+};
+const SCHEIN_DESC = {
+  'Профессиональная компетентность':'Стремление к мастерству, признание как эксперта в своей области.',
+  'Менеджмент':'Стремление к руководству, координации и принятию стратегических решений.',
+  'Автономия':'Потребность работать по собственным правилам, независимость от чужих ограничений.',
+  'Стабильность':'Ценность надёжной занятости, предсказуемости и социальных гарантий.',
+  'Предпринимательство':'Стремление создавать новое, строить собственный бизнес, рисковать.',
+  'Служение':'Ориентация на вклад в общество, помощь людям как смысл профессии.',
+  'Вызов':'Мотивация решать сложные, конкурентные, нестандартные задачи.',
+  'Стиль жизни':'Приоритет баланса между работой и личной/семейной жизнью.'
+};
+
+const MBI_Q = [
+  // Exhaustion: 0-4
+  "Работа эмоционально истощает меня.",
+  "К концу рабочего дня я чувствую себя выжатым(ой).",
+  "Утром мне тяжело думать о предстоящем рабочем дне.",
+  "Работа доводит меня до изнеможения.",
+  "Я чувствую себя перегруженным(ой) работой.",
+  // Cynicism: 5-9
+  "С тех пор как я занимаю эту должность, мой интерес к ней снизился.",
+  "Я стал(а) сомневаться в значимости своей работы.",
+  "Я стал(а) более равнодушным(ой) к своей работе.",
+  "Меня мало что увлекает в моей нынешней работе.",
+  "Я циничнее отношусь к своей профессиональной деятельности, чем раньше.",
+  // Professional Efficacy: 10-15 (высокий балл = хорошо)
+  "Я могу эффективно решать проблемы, возникающие в моей работе.",
+  "Я вношу ценный вклад в работу своей организации.",
+  "По мнению коллег, я хорошо справляюсь с рабочими задачами.",
+  "Я чувствую воодушевление, когда достигаю значимого результата на работе.",
+  "За время работы я многого добился(лась) в профессиональном плане.",
+  "Я уверен(а) в своей профессиональной компетентности."
+];
+const MBI_KEYS = {EX:[0,1,2,3,4], CY:[5,6,7,8,9], PE:[10,11,12,13,14,15]};
+
+const CS_Q = [
+  "Я доволен(льна) тем, чего достиг(ла) в своей карьере.",
+  "Я доволен(льна) прогрессом в достижении своих общих карьерных целей.",
+  "Я доволен(льна) прогрессом в достижении своих целей в плане дохода.",
+  "Я доволен(льна) прогрессом в развитии новых профессиональных навыков.",
+  "Я доволен(льна) прогрессом в достижении карьерного роста и продвижения."
+];
+
+const ZEER_Q = [
+  // Нормативный кризис: 0-6
+  "Мои первоначальные ожидания от этой работы существенно расходятся с реальностью.",
+  "Я пересматриваю своё отношение к выбранной профессии.",
+  "Меня всё больше привлекают направления деятельности, которые я раньше не рассматривал(а).",
+  "Я нахожусь в процессе переосмысления своих карьерных целей.",
+  "То, что раньше воодушевляло меня в работе, уже не вызывает прежнего энтузиазма.",
+  "Я замечаю, что мои профессиональные приоритеты меняются.",
+  "Я стою на карьерном перекрёстке и обдумываю дальнейшие варианты.",
+  // Ненормативный кризис: 7-13
+  "Длительное время я испытываю неудовлетворённость работой.",
+  "Я чувствую, что застрял(а) в карьере и не вижу выхода.",
+  "Мне всё сложнее находить смысл в своей профессиональной деятельности.",
+  "Я регулярно думаю о смене работы или профессии.",
+  "Моя мотивация к работе значительно снизилась за последнее время.",
+  "Я не вижу для себя карьерных перспектив в нынешней организации.",
+  "Ощущение профессионального тупика знакомо мне не понаслышке.",
+  // Деструктивный выход: 14-19
+  "У меня появились серьёзные мысли об уходе из профессии или компании.",
+  "Моя работоспособность заметно снизилась.",
+  "Я всё чаще прихожу на работу без желания и интереса.",
+  "Профессиональные конфликты стали привычным явлением в моей жизни.",
+  "Мне безразлично, насколько хорошо я выполняю свою работу.",
+  "Я работаю формально, «лишь бы день прошёл»."
+];
+const ZEER_KEYS = {NORM:[0,1,2,3,4,5,6], UNNORM:[7,8,9,10,11,12,13], DESTR:[14,15,16,17,18,19]};
+
+// ─── RENDER QUESTIONS ─────────────────────────────────────────────────────────
+function makeS4(qArr, prefix) {
+  const labels = ['Совсем не про меня','Скорее нет','Скорее да','Полностью про меня'];
+  return qArr.map((q,i)=>`
+    <div class="qblock">
+      <div class="qnum">Вопрос ${i+1}</div>
+      <div class="qtxt">${q}</div>
+      <div class="s4">
+        ${labels.map((l,v)=>`<label><input type="radio" name="${prefix}_${i}" value="${v+1}"><span class="b">${l}</span></label>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function makeS5(qArr, prefix) {
+  const labels = ['Совсем не согласен(на)','Не согласен(на)','Затрудняюсь','Согласен(на)','Полностью согласен(на)'];
+  return qArr.map((q,i)=>`
+    <div class="qblock">
+      <div class="qnum">Вопрос ${i+1}</div>
+      <div class="qtxt">${q}</div>
+      <div class="s5">
+        ${labels.map((l,v)=>`<label><input type="radio" name="${prefix}_${i}" value="${v+1}"><span class="b">${l}</span></label>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function makeS7(qArr, prefix) {
+  const vals = ['0','1','2','3','4','5','6'];
+  return qArr.map((q,i)=>`
+    <div class="qblock">
+      <div class="qnum">Вопрос ${i+1}</div>
+      <div class="qtxt">${q}</div>
+      <div class="s7-labels"><span>Никогда</span><span>Каждый день</span></div>
+      <div class="s7">
+        ${vals.map(v=>`<label><input type="radio" name="${prefix}_${i}" value="${v}"><span class="b">${v}</span></label>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function makeS10(qArr, prefix) {
+  const vals = ['1','2','3','4','5','6','7','8','9','10'];
+  return qArr.map((q,i)=>`
+    <div class="qblock">
+      <div class="qnum">Вопрос ${i+1}</div>
+      <div class="qtxt">${q}</div>
+      <div class="s10-labels"><span>1 — Совсем не верно</span><span>10 — Абсолютно верно</span></div>
+      <div class="s10-wrap"><div class="s10">
+        ${vals.map(v=>`<label><input type="radio" name="${prefix}_${i}" value="${v}"><span class="b">${v}</span></label>`).join('')}
+      </div></div>
+    </div>`).join('');
+}
+
+document.getElementById('mipi_qs').innerHTML = makeS4(MIPI_Q,'m');
+document.getElementById('schein_qs').innerHTML = makeS10(SCHEIN_Q,'s');
+document.getElementById('mbi_qs').innerHTML = makeS7(MBI_Q,'b');
+document.getElementById('cs_qs').innerHTML = makeS5(CS_Q,'c');
+document.getElementById('zeer_qs').innerHTML = makeS4(ZEER_Q,'z');
+
+// Style radio options on click
+document.querySelectorAll('.ropts').forEach(group=>{
+  group.querySelectorAll('.ropt').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      group.querySelectorAll('.ropt').forEach(o=>o.classList.remove('sel'));
+      opt.classList.add('sel');
+    });
+  });
+});
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+let curSec = 0;
+const TOTAL = 7;
+const stepNames = ['Общие сведения','Профессиональная идентичность (МИПИ)','Якоря карьеры (Шейн)','Выгорание (MBI-GS)','Удовлетворённость карьерой','Кризис профессии (Зеер)','Ваши результаты'];
+
+function showSec(n) {
+  document.querySelectorAll('.section').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.getElementById('progFill').style.width = (n/(TOTAL-1)*100)+'%';
+  document.getElementById('progText').textContent = `Шаг ${n+1} из ${TOTAL}: ${stepNames[n]}`;
+  document.getElementById('btnPrev').style.display = n===0?'none':'block';
+  document.getElementById('btnNext').textContent = n===TOTAL-2 ? 'Завершить и получить результаты ✓' : (n===TOTAL-1 ? '' : 'Далее →');
+  document.getElementById('btnNext').style.display = n===TOTAL-1?'none':'block';
+  window.scrollTo(0,0);
+}
+
+function getVal(name) {
+  const el = document.querySelector(`[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+function getAllVals(prefix, count) {
+  const res = [];
+  for(let i=0;i<count;i++) res.push(getVal(`${prefix}_${i}`));
+  return res;
+}
+function allAnswered(vals) { return vals.every(v=>v!==null); }
+
+function nav(dir) {
+  // Validate current section
+  if(dir===1) {
+    if(curSec===0) {
+      const code=document.getElementById('d_code').value.trim();
+      const dept=document.getElementById('d_dept').value.trim();
+      const age=getVal('age');
+      const expdo=getVal('exp_do');
+      const expgpn=getVal('exp_gpn');
+      const expT=document.getElementById('d_exp_total').value;
+      const err=document.getElementById('errDemо');
+      if(!code||!dept||!age||!expdo||!expgpn||!expT){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+      err.style.display='none';
+    }
+    if(curSec===1) {
+      const vals=getAllVals('m',MIPI_Q.length);
+      const err=document.getElementById('errMipi');
+      if(!allAnswered(vals)){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+      err.style.display='none';
+    }
+    if(curSec===2) {
+      const vals=getAllVals('s',SCHEIN_Q.length);
+      const err=document.getElementById('errSchein');
+      if(!allAnswered(vals)){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+      err.style.display='none';
+    }
+    if(curSec===3) {
+      const vals=getAllVals('b',MBI_Q.length);
+      const err=document.getElementById('errMbi');
+      if(!allAnswered(vals)){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+      err.style.display='none';
+    }
+    if(curSec===4) {
+      const vals=getAllVals('c',CS_Q.length);
+      const err=document.getElementById('errCs');
+      if(!allAnswered(vals)){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+      err.style.display='none';
+    }
+    if(curSec===5) {
+      const vals=getAllVals('z',ZEER_Q.length);
+      const err=document.getElementById('errZeer');
+      if(!allAnswered(vals)){err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+      err.style.display='none';
+      // Score and submit
+      computeAndSubmit();
+      return;
+    }
+  }
+  curSec = Math.max(0, Math.min(TOTAL-1, curSec+dir));
+  showSec(curSec);
+}
+
+// ─── SCORING ──────────────────────────────────────────────────────────────────
+function sum(vals, indices) {
+  return indices.reduce((a,i)=>a+parseInt(vals[i]),0);
+}
+function avg(vals, indices) {
+  return (sum(vals,indices)/indices.length).toFixed(2);
+}
+
+function scoreMipi(vals) {
+  const scores = {};
+  for(const [k,idx] of Object.entries(MIPI_KEYS)) scores[k]=sum(vals,idx);
+  const maxKey = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  return {scores, dominant: maxKey};
+}
+
+function scoreSchein(vals) {
+  const avgs = {};
+  for(const [k,idx] of Object.entries(SCHEIN_KEYS)) avgs[k]=parseFloat(avg(vals,idx));
+  const sorted = Object.entries(avgs).sort((a,b)=>b[1]-a[1]);
+  return {avgs, top: sorted[0][0], second: sorted[1][0]};
+}
+
+function scoreMbi(vals) {
+  const EX = sum(vals, MBI_KEYS.EX);
+  const CY = sum(vals, MBI_KEYS.CY);
+  const PE = sum(vals, MBI_KEYS.PE);
+  return {EX, CY, PE};
+}
+
+function scoreCs(vals) {
+  return {total: sum(vals, [0,1,2,3,4])};
+}
+
+function scoreZeer(vals) {
+  const NORM=sum(vals, ZEER_KEYS.NORM);
+  const UNNORM=sum(vals, ZEER_KEYS.UNNORM);
+  const DESTR=sum(vals, ZEER_KEYS.DESTR);
+  return {NORM,UNNORM,DESTR};
+}
+
+// ─── RESULT RENDERING ─────────────────────────────────────────────────────────
+function badge(level) {
+  if(level==='low') return '<span class="rbadge bg-g">Низкий</span>';
+  if(level==='mid') return '<span class="rbadge bg-y">Умеренный</span>';
+  return '<span class="rbadge bg-r">Высокий</span>';
+}
+function bar(pct, level) {
+  const cls = level==='low'?'bar-g':level==='mid'?'bar-y':'bar-r';
+  return `<div class="rbar-bg"><div class="rbar ${cls}" style="width:${pct}%"></div></div>`;
+}
+
+function renderResults(mipi,schein,mbi,cs,zeer) {
+  const container=document.getElementById('results_container');
+  let html='';
+
+  // 1. МИПИ
+  const mipiNames={A:'Достигнутая',B:'Мораторий',C:'Преждевременная',D:'Диффузная'};
+  const mipiInterp={
+    A:'Вы сформировали устойчивую профессиональную идентичность: чётко понимаете свои профессиональные ценности и целенаправленно движетесь к карьерным целям.',
+    B:'Вы активно исследуете профессиональные альтернативы, находитесь в процессе поиска. Это нормальный и продуктивный этап профессионального становления.',
+    C:'Ваш профессиональный выбор был сделан скорее под влиянием обстоятельств, чем осознанно. Возможно, стоит критически переосмыслить свой путь.',
+    D:'Профессиональная идентичность пока не сформирована: нет ни поиска, ни выбора. Это сигнал для целенаправленной работы над карьерными целями.'
+  };
+  const mipiColors={A:'g',B:'y',C:'y',D:'r'};
+  html+=`<div class="res-card"><h3>1. Профессиональная идентичность (МИПИ)</h3>`;
+  for(const [k,idx] of Object.entries(MIPI_KEYS)) {
+    const sc=mipi.scores[k], pct=Math.round((sc-5)/15*100);
+    const isDom=k===mipi.dominant;
+    const col=mipiColors[k];
+    html+=`<div class="rsubscale">
+      <div class="rsubscale-hd">
+        <span class="rsubscale-nm">${MIPI_NAMES[k]}${isDom?' ⬅ Ведущий статус':''}</span>
+        <span class="rbadge bg-${col}">${sc} / 20</span>
+      </div>
+      ${bar(pct,col==='g'?'low':col==='y'?'mid':'high')}
+    </div>`;
+  }
+  html+=`<div class="interp-text">🔍 <strong>Ведущий статус:</strong> ${MIPI_NAMES[mipi.dominant]}<br>${mipiInterp[mipi.dominant]}</div></div>`;
+
+  // 2. Якоря Шейна
+  const allAvgs=Object.values(schein.avgs);
+  const maxA=Math.max(...allAvgs);
+  html+=`<div class="res-card"><h3>2. Якоря карьеры (Шейн)</h3>`;
+  html+=`<div class="anchor-top"><h4>🏆 Ведущие якоря: ${schein.top} + ${schein.second}</h4>
+    <p>${SCHEIN_DESC[schein.top]}</p></div>`;
+  const sortedAnchors=Object.entries(schein.avgs).sort((a,b)=>b[1]-a[1]);
+  sortedAnchors.forEach(([k,v])=>{
+    const pct=Math.round(v/10*100);
+    const col=v>=7?'g':v>=5?'y':'r';
+    html+=`<div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">${k}</span><span class="rbadge bg-${col}">${v}</span></div>
+      ${bar(pct,col==='g'?'low':col==='y'?'mid':'high')}
+    </div>`;
+  });
+  html+=`</div>`;
+
+  // 3. MBI-GS
+  const exLvl=mbi.EX<=13?'low':mbi.EX<=22?'mid':'high';
+  const cyLvl=mbi.CY<=8?'low':mbi.CY<=16?'mid':'high';
+  const peLvl=mbi.PE>=31?'low':mbi.PE>=24?'mid':'high'; // inverted: high PE = low burnout
+  const exInterp=['Признаков эмоционального истощения нет.','Умеренное эмоциональное истощение.','Выраженное эмоциональное истощение — требует внимания.'];
+  const cyInterp=['Высокая вовлечённость и мотивация.','Умеренный цинизм — стоит следить за динамикой.','Выраженный цинизм и отстранённость от работы.'];
+  const peInterp=['Высокая профессиональная эффективность.','Умеренное снижение ощущения эффективности.','Выраженное снижение профессиональной самооценки.'];
+  const lvlI={'low':0,'mid':1,'high':2};
+  html+=`<div class="res-card"><h3>3. Профессиональное выгорание (MBI-GS)</h3>
+    <div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">Эмоциональное истощение</span>${badge(exLvl)} <span style="font-size:12px;color:#94a3b8">${mbi.EX}/30</span></div>
+      ${bar(Math.round(mbi.EX/30*100),exLvl)}
+      <div class="rinterp">${exInterp[lvlI[exLvl]]}</div>
+    </div>
+    <div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">Цинизм / Деперсонализация</span>${badge(cyLvl)} <span style="font-size:12px;color:#94a3b8">${mbi.CY}/30</span></div>
+      ${bar(Math.round(mbi.CY/30*100),cyLvl)}
+      <div class="rinterp">${cyInterp[lvlI[cyLvl]]}</div>
+    </div>
+    <div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">Профессиональная эффективность</span>${badge(peLvl)} <span style="font-size:12px;color:#94a3b8">${mbi.PE}/36</span></div>
+      ${bar(Math.round(mbi.PE/36*100),peLvl)}
+      <div class="rinterp">${peInterp[lvlI[peLvl]]}</div>
+    </div>
+  </div>`;
+
+  // 4. Career Satisfaction
+  const csLvl=cs.total<=14?'high':cs.total<=19?'mid':'low'; // inverted for satisfaction
+  const csInterp=['Высокая удовлетворённость карьерой — вы довольны своими достижениями.','Умеренная удовлетворённость карьерой — есть области для роста.','Низкая удовлетворённость карьерой — стоит проработать карьерные цели.'];
+  const csActual=cs.total<=14?2:cs.total<=19?1:0;
+  html+=`<div class="res-card"><h3>4. Удовлетворённость карьерой (Гринхаус)</h3>
+    <div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">Общий индекс</span><span class="rbadge ${cs.total>=20?'bg-g':cs.total>=15?'bg-y':'bg-r'}">${cs.total} / 25</span></div>
+      ${bar(Math.round((cs.total-5)/20*100),cs.total>=20?'low':cs.total>=15?'mid':'high')}
+      <div class="rinterp">${csInterp[csActual]}</div>
+    </div>
+  </div>`;
+
+  // 5. Зеер
+  const nLvl=zeer.NORM<=14?'low':zeer.NORM<=21?'mid':'high';
+  const uLvl=zeer.UNNORM<=14?'low':zeer.UNNORM<=21?'mid':'high';
+  const dLvl=zeer.DESTR<=10?'low':zeer.DESTR<=17?'mid':'high';
+  const zInterp = {
+    NORM: ['Признаков нормативного кризиса нет.','Признаки нормативного кризиса перехода — типичны для данного этапа карьеры.','Выраженный нормативный кризис — активный период карьерной переориентации.'],
+    UNNORM: ['Признаков затяжного профессионального кризиса нет.','Признаки ненормативного кризиса — длительная неудовлетворённость требует внимания.','Выраженный ненормативный кризис — необходима работа с HR и руководством.'],
+    DESTR: ['Деструктивных тенденций нет — кризис разрешается конструктивно.','Риск деструктивного выхода из кризиса — важно своевременно вмешаться.','Выраженный деструктивный выход — срочное карьерное консультирование необходимо.']
+  };
+  html+=`<div class="res-card"><h3>5. Кризис профессиональной деятельности (Зеер)</h3>
+    <div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">Нормативный кризис</span>${badge(nLvl)} <span style="font-size:12px;color:#94a3b8">${zeer.NORM}/28</span></div>
+      ${bar(Math.round((zeer.NORM-7)/21*100),nLvl)}
+      <div class="rinterp">${zInterp.NORM[{low:0,mid:1,high:2}[nLvl]]}</div>
+    </div>
+    <div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">Ненормативный кризис</span>${badge(uLvl)} <span style="font-size:12px;color:#94a3b8">${zeer.UNNORM}/28</span></div>
+      ${bar(Math.round((zeer.UNNORM-7)/21*100),uLvl)}
+      <div class="rinterp">${zInterp.UNNORM[{low:0,mid:1,high:2}[uLvl]]}</div>
+    </div>
+    <div class="rsubscale">
+      <div class="rsubscale-hd"><span class="rsubscale-nm">Риск деструктивного выхода</span>${badge(dLvl)} <span style="font-size:12px;color:#94a3b8">${zeer.DESTR}/24</span></div>
+      ${bar(Math.round((zeer.DESTR-6)/18*100),dLvl)}
+      <div class="rinterp">${zInterp.DESTR[{low:0,mid:1,high:2}[dLvl]]}</div>
+    </div>
+  </div>`;
+
+  container.innerHTML=html;
+}
+
+// ─── COMPUTE & SUBMIT ─────────────────────────────────────────────────────────
+function computeAndSubmit() {
+  // Collect all values
+  const mVals=getAllVals('m',MIPI_Q.length);
+  const sVals=getAllVals('s',SCHEIN_Q.length);
+  const bVals=getAllVals('b',MBI_Q.length);
+  const cVals=getAllVals('c',CS_Q.length);
+  const zVals=getAllVals('z',ZEER_Q.length);
+
+  const mipi=scoreMipi(mVals);
+  const schein=scoreSchein(sVals);
+  const mbi=scoreMbi(bVals);
+  const cs=scoreCs(cVals);
+  const zeer=scoreZeer(zVals);
+
+  // Build payload for Google Sheets
+  const code=document.getElementById('d_code').value.trim();
+  const payload={
+    timestamp: new Date().toISOString(),
+    kod: code,
+    podrazdeleniye: document.getElementById('d_dept').value.trim(),
+    pol: getVal('gender')||'Не указан',
+    vozrast: getVal('age'),
+    stazh_DO: getVal('exp_do'),
+    stazh_GPN: getVal('exp_gpn'),
+    obshhiy_stazh: document.getElementById('d_exp_total').value,
+    // МИПИ
+    mipi_A: mipi.scores.A,
+    mipi_B: mipi.scores.B,
+    mipi_C: mipi.scores.C,
+    mipi_D: mipi.scores.D,
+    mipi_status: MIPI_NAMES[mipi.dominant],
+    // Якоря
+    yakori_komp: schein.avgs['Профессиональная компетентность'],
+    yakori_mgmt: schein.avgs['Менеджмент'],
+    yakori_auto: schein.avgs['Автономия'],
+    yakori_stab: schein.avgs['Стабильность'],
+    yakori_pred: schein.avgs['Предпринимательство'],
+    yakori_sluzh: schein.avgs['Служение'],
+    yakori_vyzov: schein.avgs['Вызов'],
+    yakori_stil: schein.avgs['Стиль жизни'],
+    yakori_top1: schein.top,
+    yakori_top2: schein.second,
+    // MBI-GS
+    mbi_ex: mbi.EX,
+    mbi_cy: mbi.CY,
+    mbi_pe: mbi.PE,
+    // CS
+    cs_total: cs.total,
+    // Зеер
+    zeer_norm: zeer.NORM,
+    zeer_unnorm: zeer.UNNORM,
+    zeer_destr: zeer.DESTR,
+    // Raw answers (semicolon-separated)
+    raw_mipi: mVals.join(';'),
+    raw_schein: sVals.join(';'),
+    raw_mbi: bVals.join(';'),
+    raw_cs: cVals.join(';'),
+    raw_zeer: zVals.join(';')
+  };
+
+  // Show sending overlay
+  document.getElementById('sendingOverlay').classList.add('show');
+
+  // Render results immediately (don't wait for response)
+  document.getElementById('resSubtitle').textContent = 'Код участника: ' + code;
+  renderResults(mipi, schein, mbi, cs, zeer);
+
+  // Navigate to results
+  curSec=6;
+  showSec(6);
+  document.getElementById('sendingOverlay').classList.remove('show');
+
+  // Send to Google Sheets in background
+  fetch(GAS_URL, {
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).catch(e=>console.warn('Отправка в таблицу:', e));
+}
+
+// Initialize
+showSec(0);
+</script>
+</body>
+</html>
